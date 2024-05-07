@@ -1,0 +1,41 @@
+name: Terraform CI CD Pipeline for Deploying AWS Resources
+run-name: ${{ github.actor }} has triggered a ${{ github.event_name }} event!
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+ 
+
+jobs:
+  terraform:
+      name: deploy-terraform
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+        - name: Terraform Init
+          id: init
+          run: terraform init
+          working-directory: ./tf-vpc
+        - name: Terraform Validate
+          id: validate
+          run: terraform validate
+          working-directory: ./tf-vpc
+        - name: Terraform Plan
+          id: plan
+          run: terraform plan
+          working-directory: ./tf-vpc
+        - name: Terraform Apply
+          id: apply
+          run: terraform apply --auto-approve
+          working-directory: ./tf-vpc
+ 
+ 
