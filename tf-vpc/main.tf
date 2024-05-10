@@ -7,6 +7,7 @@ module "vpc" {
 module "sg" {
   source = "./modules/sg"
   vpc_id = module.vpc.vpc_id
+  all_ipv4_cidr = var.all_ipv4_cidr
 }
 
 module "ec2" {
@@ -17,7 +18,7 @@ module "ec2" {
 
 module "alb" {
   source       = "./modules/alb"
-  sg_id        = module.sg.sg_id
+  sg_id        = module.sg.alb_sg_id
   subnet_ids   = module.vpc.subnet_ids
   vpc_id       = module.vpc.vpc_id
   instance_ids = module.ec2.instance_ids
