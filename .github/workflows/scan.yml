@@ -1,0 +1,36 @@
+name: Detect security violations on Terraform files
+run-name: ${{ github.actor }} has triggered a ${{ github.event_name }} event!
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feature*
+
+jobs:
+  terraform:
+      name: scan-iac
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+          
+        - name: Terrascan IaC scanner
+          id: terrascan
+          uses: tenable/terrascan-action@v1.4.1
+          with:
+            iac_type: 'terraform'
+            iac_dir: './tf-vpc'
+            iac_version: 'v14'
+            policy_type: 'aws'
+            # skip_rules: 'ruleID1,ruleID2'
+            only_warn: 'true'
+            sarif_upload: 'true'
+            verbose: 'true'
+
+        - name: Upload SARIF file
+          uses: github/codeql-action/upload-sarif@v2
+          with:
+            sarif_file: terrascan.sarif
+          
+      
