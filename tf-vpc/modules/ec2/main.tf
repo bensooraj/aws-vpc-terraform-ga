@@ -9,8 +9,8 @@ resource "aws_instance" "web" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 
   user_data = <<EOF

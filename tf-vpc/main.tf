@@ -5,8 +5,9 @@ module "vpc" {
 }
 
 module "sg" {
-  source = "./modules/sg"
-  vpc_id = module.vpc.vpc_id
+  source        = "./modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  vpc_cidr      = var.vpc_cidr
   all_ipv4_cidr = var.all_ipv4_cidr
 }
 
