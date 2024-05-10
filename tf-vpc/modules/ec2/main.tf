@@ -8,14 +8,20 @@ resource "aws_instance" "web" {
 
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+  }
+
   user_data = <<EOF
     #!/bin/bash
     sudo yum update -y
     sudo yum install -y httpd
 
-    export META_INST_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
-    export META_INST_TYPE=`curl http://169.254.169.254/latest/meta-data/instance-type`
-    export META_INST_AZ=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone`
+    export TOKEN=`curl -X PUT "http://192.0.2.0/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    export META_INST_ID=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
+    export META_INST_TYPE=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-type`
+    export META_INST_AZ=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone`
 
     systemctl start httpd
     systemctl enable httpd
